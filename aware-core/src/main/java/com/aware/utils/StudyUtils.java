@@ -200,7 +200,8 @@ public class StudyUtils extends IntentService {
         boolean is_developer = Aware.getSetting(context, Aware_Preferences.DEBUG_FLAG).equals("true");
 
         //First reset the client to default settings...
-        Aware.reset(context);
+        //Nope, let's just override them.
+        //Aware.reset(context);
 
         if (is_developer) Aware.setSetting(context, Aware_Preferences.DEBUG_FLAG, true);
 
@@ -225,7 +226,8 @@ public class StudyUtils extends IntentService {
                 e.printStackTrace();
             }
         }
-
+        //TODO: Find Solution for mqtt credentials and sensor frequenies. Currently, they are set to the values of the last study joined.
+        //Sensor activation is NOT affected as the JSON Strings from the server only contain active Sensors.
         //Set the sensors' settings first
         for (int i = 0; i < sensors.length(); i++) {
             try {

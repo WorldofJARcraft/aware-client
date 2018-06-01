@@ -345,7 +345,7 @@ public class WiFi extends Aware_Sensor {
                 }
 
                 if (intent.getAction().equals(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION)) {
-                    WifiInfo wifi = wifiManager.getConnectionInfo();
+                    WifiInfo wifi = wifiManager != null ? wifiManager.getConnectionInfo() : null;
                     if (wifi == null) return;
 
                     WifiInfoFetch wifiInfo = new WifiInfoFetch(getApplicationContext(), wifi);

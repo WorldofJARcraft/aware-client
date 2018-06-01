@@ -150,9 +150,7 @@ public class Accelerometer extends Aware_Sensor implements SensorEventListener {
                     }
                 }).run();
             }
-        } catch (SQLiteException e) {
-            if (Aware.DEBUG) Log.d(TAG, e.getMessage());
-        } catch (SQLException e) {
+        } catch (Exception e) {
             if (Aware.DEBUG) Log.d(TAG, e.getMessage());
         }
         data_values.clear();

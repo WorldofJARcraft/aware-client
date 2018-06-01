@@ -196,6 +196,10 @@ public class SSLManager {
             Log.d(Aware.TAG, "Certificates: " + ioe.getMessage());
             return null;
         }
+        catch (ClassCastException e){
+            e.printStackTrace();
+            return null;
+        }
     }
 
     /**

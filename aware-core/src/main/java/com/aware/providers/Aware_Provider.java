@@ -383,12 +383,14 @@ public class Aware_Provider extends ContentProvider {
      * @return
      */
     public static String getAuthority(Context context) {
+        //Different Package Name
         AUTHORITY = context.getPackageName() + ".provider.aware";
         return AUTHORITY;
     }
 
     @Override
     public boolean onCreate() {
+
         AUTHORITY = getContext().getPackageName() + ".provider.aware";
 
         sUriMatcher = new UriMatcher(UriMatcher.NO_MATCH);

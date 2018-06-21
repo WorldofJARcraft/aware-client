@@ -4,7 +4,10 @@ package com.aware.utils;
  * Created by denzilferreira on 16/02/16.
  */
 
+import android.accounts.Account;
+import android.accounts.AccountManager;
 import android.app.IntentService;
+import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
@@ -13,6 +16,7 @@ import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.database.DatabaseUtils;
 import android.net.Uri;
+import android.os.Bundle;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -226,12 +230,16 @@ public class StudyUtils extends IntentService {
                 e.printStackTrace();
             }
         }
+        String webservice_server=null;
         //TODO: Find Solution for mqtt credentials and sensor frequenies. Currently, they are set to the values of the last study joined.
         //Sensor activation is NOT affected as the JSON Strings from the server only contain active Sensors.
         //Set the sensors' settings first
         for (int i = 0; i < sensors.length(); i++) {
             try {
                 JSONObject sensor_config = sensors.getJSONObject(i);
+                if(sensor_config.getString("setting").equalsIgnoreCase("webservice_server")){
+                    webservice_server = sensor_config.getString("value");
+                }
                 Aware.setSetting(context, sensor_config.getString("setting"), sensor_config.get("value"));
             } catch (JSONException e) {
                 e.printStackTrace();
@@ -272,7 +280,19 @@ public class StudyUtils extends IntentService {
 
         Intent aware = new Intent(context, Aware.class);
         context.startService(aware);
-
+        if(webservice_server!=null){
+        Account study_account = new Account(webservice_server, Aware_Accounts.Aware_Account.AWARE_ACCOUNT_TYPE);
+            AccountManager manager = AccountManager.get(context);
+            //TODO: Add additional values like MQTT auth.
+            Bundle b=new Bundle();
+            if(!manager.addAccountExplicitly(study_account,null,b)){
+                Log.e(Aware.TAG,"Account for study could not be created!");
+            }
+            else {
+                Bundle syncBundle = new Bundle();
+                ContentResolver.addPeriodicSync(study_account,Aware_Provider.getAuthority(context),b,900);
+            }
+        }
         //Send data to server
         Intent sync = new Intent(Aware.ACTION_AWARE_SYNC_DATA);
         context.sendBroadcast(sync);

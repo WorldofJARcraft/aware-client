@@ -93,6 +93,7 @@ public class Aware_Sensor extends Service {
             for (String p : REQUIRED_PERMISSIONS) {
                 if (PermissionChecker.checkSelfPermission(this, p) != PermissionChecker.PERMISSION_GRANTED) {
                     PERMISSIONS_OK = false;
+                    System.out.println("Permission " +p+"missing.");
                     break;
                 }
             }

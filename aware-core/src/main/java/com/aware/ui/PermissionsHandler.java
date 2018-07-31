@@ -3,6 +3,7 @@ package com.aware.ui;
 import android.app.Activity;
 import android.content.ComponentName;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.PermissionChecker;
@@ -81,6 +82,7 @@ public class PermissionsHandler extends Activity {
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         if (requestCode == RC_PERMISSIONS) {
+            System.out.println("Hallo");
             int not_granted = 0;
             for (int i = 0; i < permissions.length; i++) {
                 if (grantResults[i] != PermissionChecker.PERMISSION_GRANTED) {

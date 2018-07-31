@@ -132,8 +132,13 @@ public class Aware_Plugin extends Service {
         if (PERMISSIONS_OK) {
             Aware.debug(this, "destroyed: " + getClass().getName() + " package: " + getPackageName());
         }
-
+        //for some reason causes crash when not even a plugin enabled.
+        try{
         if (contextBroadcaster != null) unregisterReceiver(contextBroadcaster);
+        }
+        catch (IllegalArgumentException e){
+            Log.e(Aware.TAG,"Receiver "+contextBroadcaster.toString() +" not registered!");
+        }
     }
 
     /**

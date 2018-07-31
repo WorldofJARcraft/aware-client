@@ -5,6 +5,7 @@ import android.content.ComponentName;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.PermissionChecker;
 import android.util.Log;
@@ -12,6 +13,7 @@ import android.util.Log;
 import com.aware.Aware;
 
 import java.util.ArrayList;
+import java.util.Vector;
 
 /**
  * This is an invisible activity used to request the needed permissions from the user from API 23 onwards.
@@ -54,12 +56,25 @@ public class PermissionsHandler extends Activity {
         Log.d("Permissions", "Permissions request for " + getPackageName());
     }
 
+    private static final Vector<String> requested_permissions = new Vector<>();
+
     @Override
     protected void onResume() {
         super.onResume();
-        if (getIntent() != null && getIntent().getExtras() != null && getIntent().getSerializableExtra(EXTRA_REQUIRED_PERMISSIONS) != null) {
+        Intent intent = getIntent();
+        if (intent != null && intent.getExtras() != null && intent.getSerializableExtra(EXTRA_REQUIRED_PERMISSIONS) != null) {
             ArrayList<String> permissionsNeeded = (ArrayList<String>) getIntent().getSerializableExtra(EXTRA_REQUIRED_PERMISSIONS);
-            ActivityCompat.requestPermissions(PermissionsHandler.this, permissionsNeeded.toArray(new String[permissionsNeeded.size()]), RC_PERMISSIONS);
+            for (String permission : permissionsNeeded) {
+                boolean not_already_requested = true;
+                for (String perm : requested_permissions)
+                    if (perm.equalsIgnoreCase(permission))
+                        not_already_requested = false;
+                if (not_already_requested && checkSelfPermission(permission)!=PackageManager.PERMISSION_GRANTED) {
+                    requested_permissions.add(permission);
+                    Log.d(Aware.TAG,"Requesting permission "+permission);
+                    ActivityCompat.requestPermissions(PermissionsHandler.this,new String[]{permission}, RC_PERMISSIONS+requested_permissions.indexOf(permission));
+                }
+            }
             if (getIntent().hasExtra(EXTRA_REDIRECT_ACTIVITY)) {
                 redirect_activity = new Intent();
                 String[] component = getIntent().getStringExtra(EXTRA_REDIRECT_ACTIVITY).split("/");
@@ -71,20 +86,25 @@ public class PermissionsHandler extends Activity {
                 String[] component = getIntent().getStringExtra(EXTRA_REDIRECT_SERVICE).split("/");
                 redirect_service.setComponent(new ComponentName(component[0], component[1]));
             }
+            //TODO: Fix for callback never called. Remove, Activity should be left in Callback.
+            finish();
         } else {
             Intent activity = new Intent();
             setResult(Activity.RESULT_OK, activity);
             finish();
         }
-
     }
-
+    //TODO: Is never triggered for some reason, but app works like this.
     @Override
-    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         if (requestCode == RC_PERMISSIONS) {
             System.out.println("Hallo");
             int not_granted = 0;
             for (int i = 0; i < permissions.length; i++) {
+                for (int j = 0; j < requested_permissions.size(); j++) {
+                    if (requested_permissions.get(j).equalsIgnoreCase(permissions[i]))
+                        requested_permissions.remove(j);
+                }
                 if (grantResults[i] != PermissionChecker.PERMISSION_GRANTED) {
                     not_granted++;
                     Log.d(Aware.TAG, permissions[i] + " was not granted");

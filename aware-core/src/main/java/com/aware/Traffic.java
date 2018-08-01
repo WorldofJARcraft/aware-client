@@ -234,9 +234,9 @@ public class Traffic extends Aware_Sensor {
     @Override
     public void onDestroy() {
         super.onDestroy();
-
-        telephonyManager.listen(networkTrafficObserver, PhoneStateListener.LISTEN_NONE);
-
+        if(telephonyManager!=null) {
+            telephonyManager.listen(networkTrafficObserver, PhoneStateListener.LISTEN_NONE);
+        }
         ContentResolver.setSyncAutomatically(Aware.getAWAREAccount(this), Traffic_Provider.getAuthority(this), false);
         ContentResolver.removePeriodicSync(
                 Aware.getAWAREAccount(this),

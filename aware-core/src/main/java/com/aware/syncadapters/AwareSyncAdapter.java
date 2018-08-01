@@ -11,6 +11,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SyncResult;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.database.DatabaseUtils;
 import android.net.ConnectivityManager;
@@ -25,9 +26,11 @@ import android.util.Log;
 
 import com.aware.Applications;
 import com.aware.Aware;
+import com.aware.AwareApplication;
 import com.aware.Aware_Preferences;
 import com.aware.R;
 import com.aware.providers.Aware_Provider;
+import com.aware.ui.PermissionsHandler;
 import com.aware.utils.Http;
 import com.aware.utils.Https;
 import com.aware.utils.SSLManager;
@@ -92,6 +95,14 @@ public class AwareSyncAdapter extends AbstractThreadedSyncAdapter {
      */
     @Override
     public void onPerformSync(Account account, Bundle extras, String authority, ContentProviderClient provider, SyncResult syncResult) {
+            try{
+                performSync(account,extras,authority,provider,syncResult);
+            }
+            catch (Exception e){
+                e.printStackTrace();
+            }
+    }
+    private void performSync(Account account, Bundle extras, String authority, ContentProviderClient provider, SyncResult syncResult){
         //Restores core AWARE service in case it get's killed
         if (!Aware.IS_CORE_RUNNING) {
             Intent aware = new Intent(mContext, Aware.class);
@@ -109,7 +120,7 @@ public class AwareSyncAdapter extends AbstractThreadedSyncAdapter {
             for (int i = 0; i < DATABASE_TABLES.length; i++) {
                 System.out.println("Tabelle "+DATABASE_TABLES[i]);
                 if(!account.name.equalsIgnoreCase("awareframework")){
-                offloadData(mContext, DATABASE_TABLES[i], account.name, TABLES_FIELDS[i], CONTEXT_URIS[i]);
+                    offloadData(mContext, DATABASE_TABLES[i], account.name, TABLES_FIELDS[i], CONTEXT_URIS[i]);
                 }
                 else{
                     offloadData(mContext, DATABASE_TABLES[i], Aware.getSetting(getContext(), Aware_Preferences.WEBSERVICE_SERVER), TABLES_FIELDS[i], CONTEXT_URIS[i]);
@@ -117,7 +128,6 @@ public class AwareSyncAdapter extends AbstractThreadedSyncAdapter {
             }
         }
     }
-
     private void offloadData(Context context, String database_table, String web_server, String table_fields, Uri CONTENT_URI) {
 
         //Fixed: not part of a study, do nothing

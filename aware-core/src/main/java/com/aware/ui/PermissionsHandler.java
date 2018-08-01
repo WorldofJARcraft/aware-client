@@ -11,6 +11,7 @@ import android.support.v4.content.PermissionChecker;
 import android.util.Log;
 
 import com.aware.Aware;
+import com.aware.AwareApplication;
 
 import java.util.ArrayList;
 import java.util.Vector;
@@ -56,11 +57,12 @@ public class PermissionsHandler extends Activity {
         Log.d("Permissions", "Permissions request for " + getPackageName());
     }
 
-    private static final Vector<String> requested_permissions = new Vector<>();
+
 
     @Override
     protected void onResume() {
         super.onResume();
+        Vector<String> requested_permissions = AwareApplication.getRequested_permissions();
         Intent intent = getIntent();
         if (intent != null && intent.getExtras() != null && intent.getSerializableExtra(EXTRA_REQUIRED_PERMISSIONS) != null) {
             ArrayList<String> permissionsNeeded = (ArrayList<String>) getIntent().getSerializableExtra(EXTRA_REQUIRED_PERMISSIONS);
@@ -97,6 +99,7 @@ public class PermissionsHandler extends Activity {
     //TODO: Is never triggered for some reason, but app works like this.
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        Vector<String> requested_permissions = AwareApplication.getRequested_permissions();
         if (requestCode == RC_PERMISSIONS) {
             System.out.println("Hallo");
             int not_granted = 0;

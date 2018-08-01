@@ -19,6 +19,7 @@ import com.aware.Aware_Preferences;
 import com.aware.ui.PermissionsHandler;
 
 import java.util.ArrayList;
+import java.util.Vector;
 
 /**
  * Aware_Sensor: Extend to integrate with the framework (extension of Android Service class).
@@ -89,19 +90,20 @@ public class Aware_Sensor extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         PERMISSIONS_OK = true;
+        Vector<String> missing_permissions = new Vector<>();
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             for (String p : REQUIRED_PERMISSIONS) {
                 if (PermissionChecker.checkSelfPermission(this, p) != PermissionChecker.PERMISSION_GRANTED) {
                     PERMISSIONS_OK = false;
+                    missing_permissions.add(p);
                     System.out.println("Permission " +p+"missing.");
-                    break;
                 }
             }
         }
 
         if (!PERMISSIONS_OK) {
             Intent permissions = new Intent(this, PermissionsHandler.class);
-            permissions.putExtra(PermissionsHandler.EXTRA_REQUIRED_PERMISSIONS, REQUIRED_PERMISSIONS);
+            permissions.putExtra(PermissionsHandler.EXTRA_REQUIRED_PERMISSIONS, missing_permissions);
             permissions.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             permissions.putExtra(PermissionsHandler.EXTRA_REDIRECT_SERVICE, getPackageName() + "/" + getClass().getName()); //restarts plugin once permissions are accepted
             startActivity(permissions);

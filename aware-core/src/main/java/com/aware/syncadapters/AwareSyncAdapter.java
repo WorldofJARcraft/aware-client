@@ -83,7 +83,7 @@ public class AwareSyncAdapter extends AbstractThreadedSyncAdapter {
 
         dontClearSensors.add("aware_studies");
     }
-
+    private static int instances = 0;
     /**
      * Sends the data to AWARE server of the study
      *
@@ -95,11 +95,16 @@ public class AwareSyncAdapter extends AbstractThreadedSyncAdapter {
      */
     @Override
     public void onPerformSync(Account account, Bundle extras, String authority, ContentProviderClient provider, SyncResult syncResult) {
+        instances ++;
             try{
                 performSync(account,extras,authority,provider,syncResult);
             }
             catch (Exception e){
                 e.printStackTrace();
+            }
+        instances --;
+            if(instances==0){
+                notifyUser(getContext(), "Finished syncing. Thanks!", true, false, notificationID);
             }
     }
     private void performSync(Account account, Bundle extras, String authority, ContentProviderClient provider, SyncResult syncResult){
@@ -244,7 +249,8 @@ public class AwareSyncAdapter extends AbstractThreadedSyncAdapter {
                         Log.d(Aware.TAG, database_table + " sync time: " + DateUtils.formatElapsedTime((System.currentTimeMillis() - start) / 1000));
 
                     if (!Aware.getSetting(context, Aware_Preferences.WEBSERVICE_SILENT).equals("true")) {
-                        notifyUser(context, "Finished syncing " + database_table + ". Thanks!", true, false, notificationID);
+                        //Done, when all current syncs have finished.
+                        //notifyUser(context, "Finished syncing " + database_table + ". Thanks!", true, false, notificationID);
                     }
                 }
             } catch (Exception e) {

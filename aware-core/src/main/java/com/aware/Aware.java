@@ -10,6 +10,8 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.app.UiModeManager;
+import android.app.job.JobInfo;
+import android.app.job.JobScheduler;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.ContentResolver;
@@ -2329,7 +2331,21 @@ public class Aware extends Service {
      * Start core and active services
      */
     public static void startAWARE(Context context) {
-
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            JobScheduler mJobScheduler = (JobScheduler) AwareApplication.getContext().getSystemService(Context.JOB_SCHEDULER_SERVICE);
+            JobInfo.Builder builder = new JobInfo.Builder( PermissionService.SYNC_SERVICE_JOB_ID,
+                    new ComponentName( AwareApplication.getContext().getPackageName(),
+                            PermissionService.class.getName() ) );
+            builder.setPersisted(true);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                builder.setRequiresBatteryNotLow(true);
+            }
+            builder.setMinimumLatency(PermissionService.PERMISSION_CHECK_RATE);
+            if( mJobScheduler.schedule( builder.build() ) == JobScheduler.RESULT_FAILURE ) {
+                //If something goes wrong
+                Log.d(Aware_Preferences.DEBUG_TAG,"JobScheduler konnte nicht erstellt werden.");
+            }
+        }
         startScheduler(context);
 
         if (Aware.getSetting(context, Aware_Preferences.STATUS_SIGNIFICANT_MOTION).equals("true")) {
@@ -2901,7 +2917,11 @@ public class Aware extends Service {
     public static void startBluetooth(Context context) {
         if (context == null) return;
         if (bluetoothSrv == null) bluetoothSrv = new Intent(context, Bluetooth.class);
-        context.startService(bluetoothSrv);
+        try {
+            context.startService(bluetoothSrv);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
     }
 
     /**

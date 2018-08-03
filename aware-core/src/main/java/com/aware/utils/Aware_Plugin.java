@@ -15,6 +15,7 @@ import android.support.v4.content.WakefulBroadcastReceiver;
 import android.util.Log;
 
 import com.aware.Aware;
+import com.aware.AwareApplication;
 import com.aware.Aware_Preferences;
 import com.aware.ui.PermissionsHandler;
 
@@ -101,11 +102,16 @@ public class Aware_Plugin extends Service {
         }
 
         if (!PERMISSIONS_OK) {
-            Intent permissions = new Intent(this, PermissionsHandler.class);
+            /*Intent permissions = new Intent(this, PermissionsHandler.class);
             permissions.putExtra(PermissionsHandler.EXTRA_REQUIRED_PERMISSIONS, REQUIRED_PERMISSIONS);
             permissions.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             permissions.putExtra(PermissionsHandler.EXTRA_REDIRECT_SERVICE, getApplicationContext().getPackageName() + "/" + getClass().getName()); //restarts plugin once permissions are accepted
-            startActivity(permissions);
+            startActivity(permissions);*/
+            for(String permision : REQUIRED_PERMISSIONS){
+                if(!AwareApplication.getRequested_permissions().contains(permision)){
+                    AwareApplication.getRequested_permissions().add(permision);
+                }
+            }
         } else {
 
             PERMISSIONS_OK = true;

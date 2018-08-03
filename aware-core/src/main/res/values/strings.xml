@@ -56,4 +56,6 @@
     <string name="sensor_keyboard">Keyboard</string>
     <string name="sensor_significant">Significant motion</string>
 
+    <string name="permission_needed">Permission required!</string>
+    <string name="please_grant_permission">Please tip and grant the required permission!</string>
 </resources>

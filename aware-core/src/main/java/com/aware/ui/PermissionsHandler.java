@@ -64,19 +64,8 @@ public class PermissionsHandler extends Activity {
         super.onResume();
         Vector<String> requested_permissions = AwareApplication.getRequested_permissions();
         Intent intent = getIntent();
-        if (intent != null && intent.getExtras() != null && intent.getSerializableExtra(EXTRA_REQUIRED_PERMISSIONS) != null) {
-            ArrayList<String> permissionsNeeded = (ArrayList<String>) getIntent().getSerializableExtra(EXTRA_REQUIRED_PERMISSIONS);
-            for (String permission : permissionsNeeded) {
-                boolean not_already_requested = true;
-                for (String perm : requested_permissions)
-                    if (perm.equalsIgnoreCase(permission))
-                        not_already_requested = false;
-                if (not_already_requested && checkSelfPermission(permission)!=PackageManager.PERMISSION_GRANTED) {
-                    requested_permissions.add(permission);
-                    Log.d(Aware.TAG,"Requesting permission "+permission);
-                    ActivityCompat.requestPermissions(PermissionsHandler.this,new String[]{permission}, RC_PERMISSIONS+requested_permissions.indexOf(permission));
-                }
-            }
+        if (intent != null) {
+                    ActivityCompat.requestPermissions(PermissionsHandler.this,AwareApplication.getRequested_permissions().toArray(new String[AwareApplication.getRequested_permissions().size()]), RC_PERMISSIONS);
             if (getIntent().hasExtra(EXTRA_REDIRECT_ACTIVITY)) {
                 redirect_activity = new Intent();
                 String[] component = getIntent().getStringExtra(EXTRA_REDIRECT_ACTIVITY).split("/");
@@ -89,10 +78,10 @@ public class PermissionsHandler extends Activity {
                 redirect_service.setComponent(new ComponentName(component[0], component[1]));
             }
             //TODO: Fix for callback never called. Remove, Activity should be left in Callback.
-            finish();
+            //finish();
         } else {
-            Intent activity = new Intent();
-            setResult(Activity.RESULT_OK, activity);
+            /*Intent activity = new Intent();
+            setResult(Activity.RESULT_OK, activity);*/
             finish();
         }
     }
@@ -147,7 +136,7 @@ public class PermissionsHandler extends Activity {
         if (redirect_service != null) {
             Log.d(TAG, "Redirecting to Service: " + redirect_service.getComponent().toString());
             redirect_service.setAction(ACTION_AWARE_PERMISSIONS_CHECK);
-            startService(redirect_service);
+            //startService(redirect_service);
         }
         if (redirect_activity != null) {
             Log.d(TAG, "Redirecting to Activity: " + redirect_activity.getComponent().toString());

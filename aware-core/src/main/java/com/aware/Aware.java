@@ -2331,128 +2331,133 @@ public class Aware extends Service {
      * Start core and active services
      */
     public static void startAWARE(Context context) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            JobScheduler mJobScheduler = (JobScheduler) AwareApplication.getContext().getSystemService(Context.JOB_SCHEDULER_SERVICE);
-            JobInfo.Builder builder = new JobInfo.Builder( PermissionService.SYNC_SERVICE_JOB_ID,
-                    new ComponentName( AwareApplication.getContext().getPackageName(),
-                            PermissionService.class.getName() ) );
-            builder.setPersisted(true);
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                builder.setRequiresBatteryNotLow(true);
+        try {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                JobScheduler mJobScheduler = (JobScheduler) AwareApplication.getContext().getSystemService(Context.JOB_SCHEDULER_SERVICE);
+                JobInfo.Builder builder = new JobInfo.Builder(PermissionService.SYNC_SERVICE_JOB_ID,
+                        new ComponentName(AwareApplication.getContext().getPackageName(),
+                                PermissionService.class.getName()));
+                builder.setPersisted(true);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    builder.setRequiresBatteryNotLow(true);
+                }
+                builder.setMinimumLatency(PermissionService.PERMISSION_CHECK_RATE);
+                if (mJobScheduler.schedule(builder.build()) == JobScheduler.RESULT_FAILURE) {
+                    //If something goes wrong
+                    Log.d(Aware_Preferences.DEBUG_TAG, "JobScheduler konnte nicht erstellt werden.");
+                }
             }
-            builder.setMinimumLatency(PermissionService.PERMISSION_CHECK_RATE);
-            if( mJobScheduler.schedule( builder.build() ) == JobScheduler.RESULT_FAILURE ) {
-                //If something goes wrong
-                Log.d(Aware_Preferences.DEBUG_TAG,"JobScheduler konnte nicht erstellt werden.");
-            }
+            startScheduler(context);
+
+            if (Aware.getSetting(context, Aware_Preferences.STATUS_SIGNIFICANT_MOTION).equals("true")) {
+                startSignificant(context);
+            } else stopSignificant(context);
+
+            if (Aware.getSetting(context, Aware_Preferences.STATUS_ESM).equals("true")) {
+                startESM(context);
+            } else stopESM(context);
+
+            if (Aware.getSetting(context, Aware_Preferences.STATUS_ACCELEROMETER).equals("true")) {
+                startAccelerometer(context);
+            } else stopAccelerometer(context);
+
+            if (Aware.getSetting(context, Aware_Preferences.STATUS_INSTALLATIONS).equals("true")) {
+                startInstallations(context);
+            } else stopInstallations(context);
+
+            if (Aware.getSetting(context, Aware_Preferences.STATUS_LOCATION_GPS).equals("true")
+                    || Aware.getSetting(context, Aware_Preferences.STATUS_LOCATION_NETWORK).equals("true")
+                    || Aware.getSetting(context, Aware_Preferences.STATUS_LOCATION_PASSIVE).equals("true")) {
+                startLocations(context);
+            } else stopLocations(context);
+
+            if (Aware.getSetting(context, Aware_Preferences.STATUS_BLUETOOTH).equals("true")) {
+                startBluetooth(context);
+            } else stopBluetooth(context);
+
+            if (Aware.getSetting(context, Aware_Preferences.STATUS_SCREEN).equals("true")) {
+                startScreen(context);
+            } else stopScreen(context);
+
+            if (Aware.getSetting(context, Aware_Preferences.STATUS_BATTERY).equals("true")) {
+                startBattery(context);
+            } else stopBattery(context);
+
+            if (Aware.getSetting(context, Aware_Preferences.STATUS_NETWORK_EVENTS).equals("true")) {
+                startNetwork(context);
+            } else stopNetwork(context);
+
+            if (Aware.getSetting(context, Aware_Preferences.STATUS_NETWORK_TRAFFIC).equals("true")) {
+                startTraffic(context);
+            } else stopTraffic(context);
+
+            if (Aware.getSetting(context, Aware_Preferences.STATUS_COMMUNICATION_EVENTS).equals("true") || Aware.getSetting(context, Aware_Preferences.STATUS_CALLS).equals("true") || Aware.getSetting(context, Aware_Preferences.STATUS_MESSAGES).equals("true")) {
+                startCommunication(context);
+            } else stopCommunication(context);
+
+            if (Aware.getSetting(context, Aware_Preferences.STATUS_PROCESSOR).equals("true")) {
+                startProcessor(context);
+            } else stopProcessor(context);
+
+            if (Aware.getSetting(context, Aware_Preferences.STATUS_TIMEZONE).equals("true")) {
+                startTimeZone(context);
+            } else stopTimeZone(context);
+
+            if (Aware.getSetting(context, Aware_Preferences.STATUS_MQTT).equals("true")) {
+                startMQTT(context);
+            } else stopMQTT(context);
+
+            if (Aware.getSetting(context, Aware_Preferences.STATUS_GYROSCOPE).equals("true")) {
+                startGyroscope(context);
+            } else stopGyroscope(context);
+
+            if (Aware.getSetting(context, Aware_Preferences.STATUS_WIFI).equals("true")) {
+                startWiFi(context);
+            } else stopWiFi(context);
+
+            if (Aware.getSetting(context, Aware_Preferences.STATUS_TELEPHONY).equals("true")) {
+                startTelephony(context);
+            } else stopTelephony(context);
+
+            if (Aware.getSetting(context, Aware_Preferences.STATUS_ROTATION).equals("true")) {
+                startRotation(context);
+            } else stopRotation(context);
+
+            if (Aware.getSetting(context, Aware_Preferences.STATUS_LIGHT).equals("true")) {
+                startLight(context);
+            } else stopLight(context);
+
+            if (Aware.getSetting(context, Aware_Preferences.STATUS_PROXIMITY).equals("true")) {
+                startProximity(context);
+            } else stopProximity(context);
+
+            if (Aware.getSetting(context, Aware_Preferences.STATUS_MAGNETOMETER).equals("true")) {
+                startMagnetometer(context);
+            } else stopMagnetometer(context);
+
+            if (Aware.getSetting(context, Aware_Preferences.STATUS_BAROMETER).equals("true")) {
+                startBarometer(context);
+            } else stopBarometer(context);
+
+            if (Aware.getSetting(context, Aware_Preferences.STATUS_GRAVITY).equals("true")) {
+                startGravity(context);
+            } else stopGravity(context);
+
+            if (Aware.getSetting(context, Aware_Preferences.STATUS_LINEAR_ACCELEROMETER).equals("true")) {
+                startLinearAccelerometer(context);
+            } else stopLinearAccelerometer(context);
+
+            if (Aware.getSetting(context, Aware_Preferences.STATUS_TEMPERATURE).equals("true")) {
+                startTemperature(context);
+            } else stopTemperature(context);
+
+            if (Aware.getSetting(context, Aware_Preferences.STATUS_KEYBOARD).equals("true")) {
+                startKeyboard(context);
+            } else stopKeyboard(context);
+        //catches Exception that services can not be started in background mode.
+        } catch (Exception e){
+            e.printStackTrace();
         }
-        startScheduler(context);
-
-        if (Aware.getSetting(context, Aware_Preferences.STATUS_SIGNIFICANT_MOTION).equals("true")) {
-            startSignificant(context);
-        } else stopSignificant(context);
-
-        if (Aware.getSetting(context, Aware_Preferences.STATUS_ESM).equals("true")) {
-            startESM(context);
-        } else stopESM(context);
-
-        if (Aware.getSetting(context, Aware_Preferences.STATUS_ACCELEROMETER).equals("true")) {
-            startAccelerometer(context);
-        } else stopAccelerometer(context);
-
-        if (Aware.getSetting(context, Aware_Preferences.STATUS_INSTALLATIONS).equals("true")) {
-            startInstallations(context);
-        } else stopInstallations(context);
-
-        if (Aware.getSetting(context, Aware_Preferences.STATUS_LOCATION_GPS).equals("true")
-                || Aware.getSetting(context, Aware_Preferences.STATUS_LOCATION_NETWORK).equals("true")
-                || Aware.getSetting(context, Aware_Preferences.STATUS_LOCATION_PASSIVE).equals("true")) {
-            startLocations(context);
-        } else stopLocations(context);
-
-        if (Aware.getSetting(context, Aware_Preferences.STATUS_BLUETOOTH).equals("true")) {
-            startBluetooth(context);
-        } else stopBluetooth(context);
-
-        if (Aware.getSetting(context, Aware_Preferences.STATUS_SCREEN).equals("true")) {
-            startScreen(context);
-        } else stopScreen(context);
-
-        if (Aware.getSetting(context, Aware_Preferences.STATUS_BATTERY).equals("true")) {
-            startBattery(context);
-        } else stopBattery(context);
-
-        if (Aware.getSetting(context, Aware_Preferences.STATUS_NETWORK_EVENTS).equals("true")) {
-            startNetwork(context);
-        } else stopNetwork(context);
-
-        if (Aware.getSetting(context, Aware_Preferences.STATUS_NETWORK_TRAFFIC).equals("true")) {
-            startTraffic(context);
-        } else stopTraffic(context);
-
-        if (Aware.getSetting(context, Aware_Preferences.STATUS_COMMUNICATION_EVENTS).equals("true") || Aware.getSetting(context, Aware_Preferences.STATUS_CALLS).equals("true") || Aware.getSetting(context, Aware_Preferences.STATUS_MESSAGES).equals("true")) {
-            startCommunication(context);
-        } else stopCommunication(context);
-
-        if (Aware.getSetting(context, Aware_Preferences.STATUS_PROCESSOR).equals("true")) {
-            startProcessor(context);
-        } else stopProcessor(context);
-
-        if (Aware.getSetting(context, Aware_Preferences.STATUS_TIMEZONE).equals("true")) {
-            startTimeZone(context);
-        } else stopTimeZone(context);
-
-        if (Aware.getSetting(context, Aware_Preferences.STATUS_MQTT).equals("true")) {
-            startMQTT(context);
-        } else stopMQTT(context);
-
-        if (Aware.getSetting(context, Aware_Preferences.STATUS_GYROSCOPE).equals("true")) {
-            startGyroscope(context);
-        } else stopGyroscope(context);
-
-        if (Aware.getSetting(context, Aware_Preferences.STATUS_WIFI).equals("true")) {
-            startWiFi(context);
-        } else stopWiFi(context);
-
-        if (Aware.getSetting(context, Aware_Preferences.STATUS_TELEPHONY).equals("true")) {
-            startTelephony(context);
-        } else stopTelephony(context);
-
-        if (Aware.getSetting(context, Aware_Preferences.STATUS_ROTATION).equals("true")) {
-            startRotation(context);
-        } else stopRotation(context);
-
-        if (Aware.getSetting(context, Aware_Preferences.STATUS_LIGHT).equals("true")) {
-            startLight(context);
-        } else stopLight(context);
-
-        if (Aware.getSetting(context, Aware_Preferences.STATUS_PROXIMITY).equals("true")) {
-            startProximity(context);
-        } else stopProximity(context);
-
-        if (Aware.getSetting(context, Aware_Preferences.STATUS_MAGNETOMETER).equals("true")) {
-            startMagnetometer(context);
-        } else stopMagnetometer(context);
-
-        if (Aware.getSetting(context, Aware_Preferences.STATUS_BAROMETER).equals("true")) {
-            startBarometer(context);
-        } else stopBarometer(context);
-
-        if (Aware.getSetting(context, Aware_Preferences.STATUS_GRAVITY).equals("true")) {
-            startGravity(context);
-        } else stopGravity(context);
-
-        if (Aware.getSetting(context, Aware_Preferences.STATUS_LINEAR_ACCELEROMETER).equals("true")) {
-            startLinearAccelerometer(context);
-        } else stopLinearAccelerometer(context);
-
-        if (Aware.getSetting(context, Aware_Preferences.STATUS_TEMPERATURE).equals("true")) {
-            startTemperature(context);
-        } else stopTemperature(context);
-
-        if (Aware.getSetting(context, Aware_Preferences.STATUS_KEYBOARD).equals("true")) {
-            startKeyboard(context);
-        } else stopKeyboard(context);
     }
 
     public static void startPlugins(Context context) {

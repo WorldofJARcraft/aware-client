@@ -64,7 +64,7 @@ public class PermissionsHandler extends Activity {
         super.onResume();
         Vector<String> requested_permissions = AwareApplication.getRequested_permissions();
         Intent intent = getIntent();
-        if (intent != null) {
+        if (intent != null && AwareApplication.getRequested_permissions()!=null && !AwareApplication.getRequested_permissions().isEmpty()) {
                     ActivityCompat.requestPermissions(PermissionsHandler.this,AwareApplication.getRequested_permissions().toArray(new String[AwareApplication.getRequested_permissions().size()]), RC_PERMISSIONS);
             if (getIntent().hasExtra(EXTRA_REDIRECT_ACTIVITY)) {
                 redirect_activity = new Intent();
